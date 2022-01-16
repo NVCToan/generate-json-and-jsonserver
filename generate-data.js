@@ -13,88 +13,57 @@ faker.locale = 'vi'
 
 
 // Employee data
-const randomEmployees = (n) =>{
+const randomEmployees = (n,departments) =>{
     
     if(n<=0) return []
     const employeeList = []
     for(i = 1 ;i<=n;i++){
+        var email = faker.internet.email();
         var employee = {
             // id:faker.datatype.uuid(),
             id:i,
             name: faker.name.findName(),
-            email: faker.internet.email(),
-            phoneNumber: faker.phone.phoneNumber()
+            email: email,
+            phone_number: faker.phone.phoneNumber(),
+            department_id: "",
+            avatar: "https://i.imgur.com/bFbOCtQ.jpg",
+            username: email,
+            password: "cmdcmd",
+            active_flag: 1
         }
-
+     
         employeeList.push(employee);
 
 
     }
-    // Thanh vien ban quan ly ktx
-    var employee1= {
-        id:41,
-        name: "Nguyễn Minh Dũng",
-        email: "nguyenminhdungtd98@gmail.com",
-        phoneNumber: "0763934399"
+    for(i = 1; i <= employeeList.length; i++){
+        var employee = employeeList[i-1]
+           // Gan cho 60/100 sv vào phòng ban Trệt, 1, 2, 3 (id= 7,4,5,6)
+        if(i<=15){
+            employee.department_id = 7
+        }
+        if(i>=16 && i <= 30){
+            employee.department_id = 4
+        }
+        if(i>=31 && i <= 45){
+            employee.department_id = 5
+        }
+        if(i>=46 && i <= 60){
+            employee.department_id = 6
+        }
+        // Ban quan ly
+        if(i>=61 && i <= 75){
+            employee.department_id = 1
+        }
+        // Doi sua chua
+        if(i>=76 && i <= 90){
+            employee.department_id = 3
+        }
+        // Kiểm tra và giám sát sinh viên
+        if(i>=91 && i <= 100){
+            employee.department_id = 8
+        }
     }
-    // Ke toan
-    var employee2= {
-        id:42,
-        name: "Nguyễn Văn Ký",
-        email: "nguyenky@gmail.com",
-        phoneNumber: "03428284832"
-    }
-    // Truong doi 1
-    var employee3= {
-        id:43,
-        name: "Nguyễn Võ Công Toàn",
-        email: "congtoan@gmail.com",
-        phoneNumber: "0957839282"
-    }
-    
-    // Truong tang 1
-    var employee4= {
-        id:44,
-        name: "Thiên Thảo",
-        email: "thienthao@gmail.com",
-        phoneNumber: "094883123"
-    }
-    // Truong tang 2
-    var employee5= {
-        id:45,
-        name: "Vũ Thị Thu Thảo",
-        email: "thuthao@gmail.com",
-        phoneNumber: "0948843123"
-    }
-    // Truong tang 3
-    var employee6= {
-        id:46,
-        name: "Nguyễn Duỹ Long",
-        email: "duylong@gmail.com",
-        phoneNumber: "0948843123"
-    }
-    // Truong tang tret
-    var employee7 = {
-        id:47,
-        name: "Nguyễn Thanh Tốt",
-        email: "thanhtot@gmail.com",
-        phoneNumber: "0948843123"
-    }
-    // Truong doi 2
-    var employee8 = {
-        id:48,
-        name: "Minh Hồ",
-        email: "minhho@gmail.com",
-        phoneNumber: "091263823"
-    }
-    employeeList.push(employee1)
-    employeeList.push(employee2)
-    employeeList.push(employee3)
-    employeeList.push(employee4)
-    employeeList.push(employee5)
-    employeeList.push(employee6)
-    employeeList.push(employee7)
-    employeeList.push(employee8)
     return employeeList;
 };
 // Department data
@@ -183,31 +152,6 @@ const randomDepartments =(n)=>{
 
     return departments;
 }
-// department_employee data
-const randomDepartments_Employees = (departments,employeesList) =>{
-    const departments_employees = []
-  
-    const employeeId = []
-
-
-    for(const employee of employeesList){
-        employeeId.push(employee.id)
-    }
-    for(const department of departments){
-        for(var i = 0;i<10;i++){
-            var indexRandom = Math.floor(Math.random() * employeeId.length);
-            const department_employee = {
-                departmentId:department.id,
-                employeeId: employeesList[indexRandom].id
-            }
-            departments_employees.push(department_employee)
-            employeeId.splice(indexRandom,1);
-        }
-
-     
-    }
-    return departments_employees;
-}
 
 // Status data
 const initStatus = () =>{
@@ -233,9 +177,12 @@ const randomTasks = (n,statuses,employeeList) =>{
             id:i,
             title:faker.lorem.words(),
             description:faker.lorem.lines(),
-            status:statuses[indexRandomStatus].id,
-            creator_id: employeeList[indexRandomEmpl].id 
+            status_id:statuses[indexRandomStatus].id,
+            creator_id: employeeList[indexRandomEmpl].id,
+            receiver_id: ""
         }
+        var indexRandomEmpl = Math.floor(Math.random() * employeeList.length);
+        task.receiver_id = employeeList[indexRandomEmpl].id;
         tasks.push(task)
 
     }
@@ -243,35 +190,18 @@ const randomTasks = (n,statuses,employeeList) =>{
 
     return tasks;
 }
-// Moi viec giao cho 3 nhan vien ngau nhien
-const randomTaskDetails =(employees,tasks)=>{
-    const task_details =[]
-    // Lay ra ds id nhan vien sau moi lan giao xong 1 viec
-    const resetIds = () =>{
-        const employeeId = []
 
-
-        for(const employee of employees){
-            employeeId.push(employee.id)
+const randomTaskHis =(tasks)=>{
+    const task_hisList =[]
+    for(i = 0 ; i < tasks.length; i++){
+        const task_his = {
+            task_id: tasks[i].id,
+            status_id: tasks[i].status_id,
+            receiver_id:tasks[i].receiver_id
         }
-        return employeeId;
+        task_hisList.push(task_his)
     }
-    var employeeId = [];
-    for(var i=1;i<=tasks.length;i++){
-
-        employeeId = resetIds();
-        for(var j=0;j<3;j++){
-            var indexRandom = Math.floor(Math.random() * employeeId.length);
-            const task_detail = {
-                id:i,
-                receiver_id:employees[indexRandom].id,
-                task_id:tasks[i-1].id
-            }
-            task_details.push(task_detail)
-            employeeId.splice(indexRandom,1);
-        }
-    }
-    return task_details;
+    return task_hisList;
    
    
 }
@@ -309,25 +239,25 @@ const initProposal_type_details = () =>{
     // pro1
     const proposal1_1 ={
         id:1,
-        proposal_types_id:1,
+        proposal_type_id:1,
         field_name: "Mục đích/Lý do",
         data_type_id: 1
     }
     const proposal1_2 ={
         id:2,
-        proposal_types_id:1,
+        proposal_type_id:1,
         field_name: "Tình trạng hư hỏng",
         data_type_id:2
     }
     const proposal1_3 ={
         id:3,
-        proposal_types_id:1,
+        proposal_type_id:1,
         field_name: "Số phòng",
         data_type_id: 1
     }
     const proposal1_4 ={
         id:4,
-        proposal_types_id:1,
+        proposal_type_id:1,
         field_name: "Ghi chú",
         data_type_id: 2
     }
@@ -338,25 +268,25 @@ const initProposal_type_details = () =>{
     //pro2
     const proposal2_1 ={
         id:5,
-        proposal_types_id:2,
+        proposal_type_id:2,
         field_name: "Mục đích/Lý do",
         data_type_id: 1
     }
     const proposal2_2 ={
         id:6,
-        proposal_types_id:2,
+        proposal_type_id:2,
         field_name: "Tên vật tư",
         data_type_id: 1
     }
     const proposal2_3 ={
         id:7,
-        proposal_types_id:2,
+        proposal_type_id:2,
         field_name: "Số lượng",
         data_type_id: 1
     }
     const proposal2_4 ={
         id:8,
-        proposal_types_id:2,
+        proposal_type_id:2,
         field_name: "Đơn gía",
         data_type_id: 1
     }
@@ -374,7 +304,7 @@ const initProposalSteps = ()=>{
         id:1,
         approval_step_name: "Phê duyệt",
         approval_step_index: 1,
-        proposal_types_id:1
+        proposal_type_id:1
 
     }
     approval_steps.push(approval1)
@@ -383,7 +313,7 @@ const initProposalSteps = ()=>{
         id:2,
         approval_step_name: "Kế toán",
         approval_step_index: 1,
-        proposal_types_id:2
+        proposal_type_id:2
 
     }
     approval_steps.push(approval2)
@@ -397,19 +327,22 @@ const initPositions = () =>{
         id:1,
         name: "Thành viên ban quản lý KTX",
         department_id:1,
-        is_manager: "true"
+        is_manager: "true",
+        role_id:1
     } 
     const positionBanQuanLy2 = {
         id:2,
         name: "Giám thị",
         department_id:1,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:2
     } 
     const positionBanQuanLy3 = {
         id:3,
         name: "Kế toán",
         department_id:1,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:3
     } 
     positions.push(positionBanQuanLy1)
     positions.push(positionBanQuanLy2)
@@ -419,7 +352,8 @@ const initPositions = () =>{
         id:4,
         name: "Trưởng đội 1",
         department_id:2,
-        is_manager: "true"
+        is_manager: "true",
+        role_id:4
     } 
     positions.push(positionBaoTri1)
     // position Doi sua chua
@@ -427,27 +361,31 @@ const initPositions = () =>{
         id:5,
         name: "Thành viên",
         department_id:3,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:5
     } 
     positions.push(positionDoiSuaChua1)
     // position Tang 1
     const positionTang1_1 = {
         id:6,
-        name: "Hỗ trợ trưởng tầng",
+        name: "Thành viên",
         department_id:4,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:5
     } 
     const positionTang1_2 = {
         id:7,
         name: "Trưởng tầng 1",
         department_id:4,
-        is_manager: "true"
+        is_manager: "true",
+        role_id:6
     }
     const positionTang1_3 = {
         id:8,
         name: "Trưởng phòng sinh viên tầng 1",
         department_id:4,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:5
     }
     
     positions.push(positionTang1_1)
@@ -456,45 +394,51 @@ const initPositions = () =>{
     //position Tang 2
     const positionTang2_1 = {
         id:9,
-        name: "Hỗ trợ trưởng tầng",
+        name: "Thành viên",
         department_id:5,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:5
     } 
     const positionTang2_2 = {
         id:10,
         name: "Trưởng tầng 2",
         department_id:5,
-        is_manager: "true"
+        is_manager: "true",
+        role_id:6
     }
     const positionTang2_3 = {
         id:11,
         name: "Trưởng phòng sinh viên tầng 2",
         department_id:5,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:5
     }
     
     positions.push(positionTang2_1)
     positions.push(positionTang2_2)
     positions.push(positionTang2_3)
-
+    
     // position Tang 3
     const positionTang3_1 = {
         id:12,
-        name: "Hỗ trợ trưởng tầng",
+        name: "Thành viên",
         department_id:6,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:5
     } 
     const positionTang3_2 = {
         id:13,
         name: "Trưởng tầng 3",
         department_id:6,
-        is_manager: "true"
+        is_manager: "true",
+        role_id:6
     }
     const positionTang3_3 = {
         id:14,
         name: "Trưởng phòng sinh viên tầng 3",
         department_id:6,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:5
     }
     
     positions.push(positionTang3_1)
@@ -503,21 +447,24 @@ const initPositions = () =>{
     // position Tang tret
     const positionTangTret_1 = {
         id:15,
-        name: "Hỗ trợ trưởng tầng",
+        name: "Thành viên",
         department_id:7,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:5
     } 
     const positionTangTret_2 = {
         id:16,
         name: "Trưởng tầng trệt",
         department_id:7,
-        is_manager: "true"
+        is_manager: "true",
+        role_id:6
     }
     const positionTangTret_3 = {
         id:17,
         name: "Trưởng phòng sinh viên tầng trệt",
         department_id:7,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:5
     }
     positions.push(positionTangTret_1)
     positions.push(positionTangTret_2)
@@ -527,16 +474,18 @@ const initPositions = () =>{
         id:18,
         name: "Thành viên",
         department_id:8,
-        is_manager: "false"
+        is_manager: "false",
+        role_id:5
     }
     const positionDoi2_2 = {
         id:19,
         name: "Trưởng đội 2",
         department_id:8,
-        is_manager: "true"
+        is_manager: "true",
+        role_id:7
     }
-    positions.push(positionDoi2_1)
-    positions.push(positionDoi2_2)
+    positions.push(positionDoi2_1);
+    positions.push(positionDoi2_2);
     return positions;
 }
 // Vai tro
@@ -585,106 +534,6 @@ const initRoles = () =>{
     roles.push(role7)
     return roles;
 }
-// position_roles
-const initPositionRoles = () =>{
-    const position_roles =[]
-    const pr1 = {
-        positions_id:1,
-        roles_id:1
-    }
-    const pr2 = {
-        positions_id:2,
-        roles_id:2
-    }
-    const pr3 = {
-        positions_id:3,
-        roles_id:3
-    }
-    const pr4 = {
-        positions_id:4,
-        roles_id:4
-    }
-    const pr5 = {
-        positions_id:5,
-        roles_id:5
-    }
-    const pr6 = {
-        positions_id:6,
-        roles_id:5
-    }
-    const pr7 = {
-        positions_id:7,
-        roles_id:6
-    }
-    const pr8 = {
-        positions_id:8,
-        roles_id:5
-    }
-    const pr9 = {
-        positions_id:9,
-        roles_id:5
-    }
-    const pr10 = {
-        positions_id:10,
-        roles_id:6
-    }
-    const pr11 = {
-        positions_id:11,
-        roles_id:5
-    }
-    const pr12 = {
-        positions_id:12,
-        roles_id:5
-    }
-    const pr13 = {
-        positions_id:13,
-        roles_id:6
-    }
-    const pr14 = {
-        positions_id:14,
-        roles_id:5
-    }
-    const pr15 = {
-        positions_id:15,
-        roles_id:5
-    }
-    const pr16 = {
-        positions_id:16,
-        roles_id:6
-    }
-    const pr17 = {
-        positions_id:17,
-        roles_id:5
-    }
-    const pr18 = {
-        positions_id:18,
-        roles_id:5
-    }
-    const pr19 = {
-        positions_id:19,
-        roles_id:7
-    }
-    position_roles.push(pr1)
-    position_roles.push(pr2)
-    position_roles.push(pr3)
-    position_roles.push(pr4)
-    position_roles.push(pr5)
-    position_roles.push(pr6)
-    position_roles.push(pr7)
-    position_roles.push(pr8)
-    position_roles.push(pr9)
-    position_roles.push(pr10)
-    position_roles.push(pr11)
-    position_roles.push(pr12)
-    position_roles.push(pr13)
-    position_roles.push(pr14)
-    position_roles.push(pr15)
-    position_roles.push(pr16)
-    position_roles.push(pr17)
-    position_roles.push(pr18)
-    position_roles.push(pr19)
-    return position_roles;
-} 
 // option
 const initOptions = () =>{
     const options = []
@@ -1126,110 +975,158 @@ const initRoleDetails = () =>{
 
 }
 // positions_employees
-const initPositionsEmployees = (departments_employees) =>{
-    const positions_has_employees = []
+const initPositionsEmployees = (employeeList) =>{
+    const positions_employees = []
     
-    // Add position "Thanh vien"
-    // id position truong phong cac tang: tret -> 3
-    // [17,8,11,14]
-    // id tang tret -> 3
-    const idsTang = [7,4,5,6];
+    // id phong ban "Tang tret", "1","2","3","Ban quan ly","Doi sua chua","To chuc su kien"
+    const idsTang = [7,4,5,6,1,3,9];
     const idsvTangTret=[]
     const idsvTang1 = []
     const idsvTang2 = []
     const idsvTang3 = []
-
-    const positionTruongPhongSVTangId = [17,8,11,14]
+    const idsvBanQuanLy = []
+    const idsvDoiSuChua = []
+    const idsvToChucSuKien = []
+    const positionTruongPhongSVTangId = [17,8,11,14] //Tret, 1, 2, 3
     for(var i = 0; i <idsTang.length; i++) {
-        for (const emp of departments_employees) {
-            if(emp.departmentId == idsTang[0]){
-                idsvTangTret.push(emp.employeeId)
+        for (const emp of employeeList) {
+            if(emp.department_id == idsTang[0]){
+                idsvTangTret.push(emp.id)
             }
-            if(emp.departmentId == idsTang[1]){
-                idsvTang1.push(emp.employeeId)
+            if(emp.department_id == idsTang[1]){
+                idsvTang1.push(emp.id)
             }
-            if(emp.departmentId == idsTang[2]){
-                idsvTang2.push(emp.employeeId)
+            if(emp.department_id == idsTang[2]){
+                idsvTang2.push(emp.id)
             }
-            if(emp.departmentId == idsTang[3]){
-                idsvTang3.push(emp.employeeId)
+            if(emp.department_id == idsTang[3]){
+                idsvTang3.push(emp.id)
+            }
+            if(emp.department_id == idsTang[4]){
+                idsvBanQuanLy.push(emp.id)
+            }
+            if(emp.department_id == idsTang[5]){
+                idsvDoiSuChua.push(emp.id)
+            }
+            if(emp.department_id == idsTang[6]){
+                idsvToChucSuKien.push(emp.id)
             }
         }
     }
     //Tang tret
     for(var  i = 0; i < (idsvTangTret.length)/2; i++){
-        const pe = {
-            employees_id:idsvTangTret[i],  
-            positions_id:positionTruongPhongSVTangId[0]
+        if(i==0){
+            const pe = {
+                employee_id:idsvTangTret[i],  
+                position_id:positionTruongPhongSVTangId[0]
+            }
+            positions_employees.push(pe)
+        }else{
+            // Position "Thanh vien" trong tang tret
+            const pe = {
+                employee_id:idsvTangTret[i],  
+                position_id:15
+            }
+            positions_employees.push(pe)
         }
-        positions_has_employees.push(pe)
+       
 
     }
     //Tang 1
-    for(var  i = 0; i < (idsvTang1.length)/2; i++){
-        const pe = {
-            employees_id:idsvTang1[i],  
-            positions_id:positionTruongPhongSVTangId[1]
+    for(var  i = 0; i < idsvTang1.length; i++){
+        if(i==0){
+            const pe = {
+                employee_id:idsvTang1[i],  
+                position_id:positionTruongPhongSVTangId[1]
+            }
+            positions_employees.push(pe)
+        }else{
+            // Position "Thanh vien" trong Tang 1
+            const pe = {
+                employee_id:idsvTang1[i],  
+                position_id:6
+            }
+            positions_employees.push(pe)
         }
-        positions_has_employees.push(pe)
+      
     }
     //Tang 2
-    for(var  i = 0; i < (idsvTang2.length)/2; i++){
-        const pe = {
-            employees_id:idsvTang2[i],  
-            positions_id:positionTruongPhongSVTangId[2]
+    for(var  i = 0; i < idsvTang2.length; i++){
+        if(i==0){
+            const pe = {
+                employee_id:idsvTang2[i],  
+                position_id:positionTruongPhongSVTangId[2]
+            }
+            positions_employees.push(pe)
+        }else{
+            // Position "Thanh vien" trong Tang 2
+            const pe = {
+                employee_id:idsvTang2[i],  
+                position_id:9
+            }
+            positions_employees.push(pe)
         }
-        positions_has_employees.push(pe)
     }
     //Tang 3
-    for(var  i = 0; i < (idsvTang3.length)/2; i++){
-        const pe = {
-            employees_id:idsvTang3[i],  
-            positions_id:positionTruongPhongSVTangId[3]
+    for(var  i = 0; i < idsvTang3.length; i++){
+        if(i==0){
+            const pe = {
+                employee_id:idsvTang3[i],  
+                position_id:positionTruongPhongSVTangId[3]
+            }
+            positions_employees.push(pe)
+        }else{
+            // Position "Thanh vien" trong Tang 1
+            const pe = {
+                employee_id:idsvTang3[i],  
+                position_id:12
+            }
+            positions_employees.push(pe)
         }
-        positions_has_employees.push(pe)
     }
-
-
-
-    const pe1 = {
-        employees_id:41,  
-        positions_id:1
+    for(var  i = 0; i < idsvBanQuanLy.length; i++){
+       
+            // Position "Thanh vien ban quan" trong phong ban "Ban quan ly"
+            const pe = {
+                employee_id:idsvBanQuanLy[i],  
+                position_id:1
+            }
+            positions_employees.push(pe)
+        
     }
+    // Doi sua chua
+    for(var  i = 0; i < idsvDoiSuChua.length; i++){
+       
+        // Position "Thanh vien" trong phong ban "Doi sua chua"
+        const pe = {
+            employee_id:idsvDoiSuChua[i],  
+            position_id:5
+        }
+        positions_employees.push(pe)
     
-    const pe2 = {
-        employees_id:42,  
-        positions_id:3
     }
-    const pe3 = {
-        employees_id:43,  
-        positions_id:4
-    }
-    const pe4 = {
-        employees_id:45,  
-        positions_id:10
-    }
-    const pe5 = {
-        employees_id:46,  
-        positions_id:13
-    }
-    const pe6 = {
-        employees_id:47,  
-        positions_id:16
-    }
-    const pe7 = {
-        employees_id:48,  
-        positions_id:19
-    }
-    positions_has_employees.push(pe1)
-    positions_has_employees.push(pe2)
-    positions_has_employees.push(pe3)
-    positions_has_employees.push(pe4)
-    positions_has_employees.push(pe5)
-    positions_has_employees.push(pe6)
-    positions_has_employees.push(pe7)
+    for(var  i = 0; i < idsvToChucSuKien.length; i++){
+       
+        // Position "Thanh vien" trong phong ban "Kiểm tra và giám sát sinh viên"
+        if(i==0){
+            //Truong doi 2
+            const pe = {
+                employee_id:idsvToChucSuKien[i],  
+                position_id:19
+            }
+            positions_employees.push(pe)
+        }else{
+            // Thanh vien doi 2
+            const pe = {
+                employee_id:idsvToChucSuKien[i],  
+                position_id:18
+            }
+            positions_employees.push(pe)
+        }
+       
     
-    return positions_has_employees;
+    }
+    return positions_employees;
 
 }
 
@@ -1238,19 +1135,19 @@ const initProposalPermissions = () =>{
     const proposals_permissions = [];
     const pro1 ={
         id: 1,
-        proposal_types_id:2,
-        departments_id: 0,
-        positions_id: 0,
+        proposal_type_id:2,
+        department_id: 0,
+        position_id: 0,
         // Minh Dung
-        employees_id: 41
+        employee_id: 41
     }
     const pro2 ={
         id: 2,
-        proposal_types_id:2,
-        departments_id: 0,
-        positions_id: 0,
+        proposal_type_id:2,
+        department_id: 0,
+        position_id: 0,
         // Cong Toan
-        employees_id: 43
+        employee_id: 43
     }
     proposals_permissions.push(pro1)
     proposals_permissions.push(pro2)
@@ -1263,32 +1160,31 @@ const initApprovalStep_Detail = () =>{
     //Loai de xuat dang ky sua chua
     const detail1 = {
         id: 1, 
-        
-        approval_steps_id: 1,
-        employees_id: 0,
-        departments_id: 0,
-        positions_id:16
+        approval_step_id: 1,
+        employee_id: 0,
+        department_id: 0,
+        position_id:16
     }
     const detail2 = {
         id: 2, 
-        approval_steps_id: 1,
-        employees_id: 0,
-        departments_id: 0,
-        positions_id:7
+        approval_step_id: 1,
+        employee_id: 0,
+        department_id: 0,
+        position_id:7
     }
     const detail3 = {
         id: 3, 
-        approval_steps_id: 1,
-        employees_id: 0,
-        departments_id: 0,
-        positions_id:10
+        approval_step_id: 1,
+        employee_id: 0,
+        department_id: 0,
+        position_id:10
     }
     const detail4 = {
         id: 3, 
-        approval_steps_id: 1,
-        employees_id: 0,
-        departments_id: 0,
-        positions_id:13
+        approval_step_id: 1,
+        employee_id: 0,
+        department_id: 0,
+        position_id:13
     }
     approval_step_details.push(detail1)
     approval_step_details.push(detail2)
@@ -1304,7 +1200,7 @@ const initProposals = (employees) =>{
             id:i,
             proposal_type_id:1,
             creator_id:indexRandom,
-            status_id:""
+            status_id:"1"
         }
         proposals.push(proposal);
     }
@@ -1320,7 +1216,7 @@ const initProposalDetails = (proposals,proposal_type_details) =>{
             if(j==1){
                 const proposalDetail = {
                     id:i+j,
-                    proposals_id:i,
+                    proposal_id:i,
                     field_id:j,
                     content: faker.lorem.sentence()
                 }
@@ -1329,7 +1225,7 @@ const initProposalDetails = (proposals,proposal_type_details) =>{
             if(j==2){
                 const proposalDetail = {
                     id:i+j,
-                    proposals_id:i,
+                    proposal_id:i,
                     field_id:j,
                     content: faker.lorem.lines()
                 }
@@ -1338,7 +1234,7 @@ const initProposalDetails = (proposals,proposal_type_details) =>{
             if(j==3){
                 const proposalDetail = {
                     id: i+j,
-                    proposals_id:i,
+                    proposal_id:i,
                     field_id:j,
                     content: faker.mersenne.rand()
                 }
@@ -1347,7 +1243,7 @@ const initProposalDetails = (proposals,proposal_type_details) =>{
             if(j==4){
                 const proposalDetail = {
                     id: i+j,
-                    proposals_id:i,
+                    proposal_id:i,
                     field_id:j,
                     content: faker.lorem.lines()
                 }
@@ -1361,9 +1257,8 @@ const initProposalDetails = (proposals,proposal_type_details) =>{
 
 
 }
-var employees = randomEmployees(40);
 var departments = randomDepartments(4);
-var departments_employees = randomDepartments_Employees(departments,employees);
+var employees = randomEmployees(100,departments);
 
 var options = initOptions();
 var permissions = initPermission();
@@ -1371,14 +1266,13 @@ var role_details = initRoleDetails();
 var roles = initRoles();
 var statuses = initStatus();
 var tasks = randomTasks(30, statuses,employees);
-var task_details = randomTaskDetails(employees,tasks);
+var task_his = randomTaskHis(tasks);
 var data_types = initDataTypes();
 var proposal_types = initProposalTypes();
 var proposal_type_details = initProposal_type_details();
 var approval_steps = initProposalSteps();
 var positions = initPositions();
-var positions_roles = initPositionRoles();
-var positions_employees = initPositionsEmployees(departments_employees);
+var positions_employees = initPositionsEmployees(employees);
 //Quyen tao de xuat
 var proposal_permissions = initProposalPermissions();
 // Quyen duyet de xuat => Dua vao day de gui thong bao moi khi co de xuat moi
@@ -1391,7 +1285,6 @@ var  proposal_details = initProposalDetails(proposals,proposal_type_details);
     const db ={
         employees: employees,
         departments: departments,
-        departments_employees: departments_employees,
         positions: positions,
         roles: roles,
         options: options,
@@ -1400,11 +1293,10 @@ var  proposal_details = initProposalDetails(proposals,proposal_type_details);
         statuses: statuses,
         data_types: data_types,
         tasks: tasks,
-        task_details: task_details,
+        task_his: task_his,
         proposal_types: proposal_types,
         proposal_type_details: proposal_type_details,
         approval_steps: approval_steps,
-        positions_roles: positions_roles,
         positions_employees: positions_employees,
         proposal_permissions: proposal_permissions,
         approval_step_details: approval_step_details,
